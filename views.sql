@@ -183,3 +183,51 @@ SELECT
     a.data_de_devolucao
  FROM aluguel a
  WHERE a.data_de_devolucao IS NULL;--onde a data_de_devolucao é igual a NULL, ou seja, vazio;
+
+ -- EXIST é para ver se tem um ou mais row(s), se utilizar not, ele nega, ou seja, ele procura quem n retorna nem uma row
+
+ SELECT 
+	* 
+FROM funcionario f
+	WHERE NOT EXISTS (
+		SELECT 
+			1 
+		FROM aluguel a
+        WHERE a.funcionario_id = f.funcionario_id
+	);
+
+-- Pega os pagamentos com o maior valor, usando o MAX
+
+SELECT 
+	* 
+FROM pagamento p
+	WHERE p.valor = (SELECT max(p1.valor) FROM pagamento p1 );
+
+--Pega os valor acima da media, usando AVG
+
+SELECT 
+	* 
+FROM pagamento p
+	WHERE p.valor >= (SELECT avg(p1.valor) FROM pagamento p1 )
+    ORDER BY p.valor DESC;
+
+-- Pega a diferença da data atual para a data de aluguel
+
+SELECT 
+	now(),
+    a.data_de_aluguel,
+	datediff(now(), a.data_de_aluguel) AS direfenca
+FROM aluguel a;
+
+-- Criando tabelas temporarias com referencia de outras tabelas
+
+WITH actors_s_pg_revenue AS--WITH nomeDaTabela AS (select que vc quer)
+	(SELECT 
+        f.funcionario_id,
+        COUNT(*)
+	FROM aluguel a
+        INNER JOIN funcionario f
+        ON f.funcionario_id = a.funcionario_id
+        GROUP BY f.funcionario_id
+)
+select * from actors_s_pg_revenue;
