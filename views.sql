@@ -231,3 +231,101 @@ WITH actors_s_pg_revenue AS--WITH nomeDaTabela AS (select que vc quer)
         GROUP BY f.funcionario_id
 )
 select * from actors_s_pg_revenue;
+
+-- Pegar o tamanho de uma string
+
+SELECT LENGTH('Yulian');
+
+-- Da a posiçao de uma palavra que você procura
+
+SELECT LOCATE('am', 'I am Singed');
+
+-- A função STRCMP() compara duas strings.
+-- Se string1 = string2 , esta função retorna 0
+-- Se string1 < string2 , esta função retorna -1
+-- Se string1 > string2 , esta função retorna 1
+
+SELECT STRCMP("SQL Tutorial", "HTML Tutorial"); -- return 1
+
+-- INSERT() string, a posição na qual começar, o número de caracteres a serem substituídos e o
+-- cadeia de substituição.
+
+SELECT INSERT('goodbye world', 8, 0, ' cruel ') OI;
+
+-- REPLACE() substitui uma string por outra, parâmetros: string original, oq vai ser substituido, oq vai substituir
+
+SELECT REPLACE('goodbye world', 'goodbye', 'hello');
+
+-- Separa um string, parâmetros: string original, aonde começa, quantos caracteres pegar
+
+SELECT SUBSTRING('goodbye cruel world', 9, 5);
+--ou 
+SELECT SUBSTR('goodbye cruel world', 9, 5);
+
+-- Arredondando valores
+-- CEIL() para cima
+-- FLOOR() para baixo
+-- ROUND() para o mais próximo
+SELECT CEIL(72.000000001), FLOOR(72.999999999); -- return 73 | 72
+SELECT ROUND(72.49999), ROUND(72.5), ROUND(72.50001); -- return 72 | 73 | 73
+
+-- Fala quantos decimais vai ter, mais n obriga ele ter esse decimais
+
+SELECT TRUNCATE(72.0909, 1), TRUNCATE(72.0909, 2), TRUNCATE(72.0909, 3); -- 72 | 72.09 | 72.090
+
+-- cast() Converte um dado para outro
+-- parametros: dado original, tipo de dado que vc quer colocar
+SELECT CAST('2019-09-17' AS DATE) date_field;
+
+
+--pega a data em uma string, parametros: string com a data, metadados;
+SELECT STR_TO_DATE('September 17, 2019', '%M %d, %Y');
+
+--pega a data atual
+SELECT CURRENT_TIMESTAMP();
+
+-- adicionando em uma data
+SELECT DATE_ADD(CURRENT_DATE(), INTERVAL 5 YEAR);  -- adiciona 5 anos
+SELECT DATE_ADD(CURRENT_DATE(), INTERVAL 5 MONTH); -- adiciona 5 meses
+SELECT DATE_ADD(CURRENT_DATE(), INTERVAL 5 HOUR);  -- adiciona 5 horas
+
+-- pegando o último dia de um mês
+SELECT LAST_DAY('2019-01-00'); -- retorna 2019-01-31
+
+-- pega o nome do dia da semana
+SELECT DAYNAME('2022-06-10'); -- retorna friday - sexta feira
+
+-- pega um dado de uma determinada data
+SELECT EXTRACT(SECOND FROM '2019-09-18 22:19:05');-- retorna os segundos dessa data -> 5
+
+-- pega a diferença entre duas datas
+SELECT DATEDIFF('2019-09-03', '2019-06-21'); -- retorno
+
+-- pega a diferença entre datas, parametros: uma data, uma data; 
+-- retorno = 1 data - 2 data, retorno em dias
+-- pode retornar valores 
+SELECT DATEDIFF('2019-09-03', '2018-06-21'); -- retorno 439
+
+-- CONVERTER VALORES
+SELECT CAST('-1456328' AS SIGNED INTEGER); -- SIGNED aceita número negativos, UNSIGNED não aceita números negativos
+-- retorno -1456328
+SELECT CAST('999ABC111' AS UNSIGNED INTEGER); -- vai pegar os primeiros valores considerados números
+-- retorno 999, o resto é ignorado
+
+-- DISTINCT é usado para encontrar campos n repetidos
+SELECT count(DISTINCT a.cliente_id) FROM aluguel a; -- conta cada vez que o id cliente for diferente
+
+-- OPERAÇÕES COM NÚMEROS
+COUNT(val) num_vals,-- conta quantos resultados foram encontrados
+SUM(val) total,     -- soma os valores
+MAX(val) max_val,   -- pega o maior valor 
+AVG(val) avg_val;   -- pega a média de vários 
+
+-- WITH ROLLOUP funciona mais ou menos para aceitar valores nulos enquando agrupa,
+-- no select ele pega a classificação null e mostra todos os filmes de um determinado atores 
+SELECT fa.ator_id, f.classificacao, count(*)
+	FROM filme_ator fa
+	INNER JOIN filme f ON fa.filme_id = f.filme_id
+    GROUP BY fa.ator_id, f.classificacao WITH ROLLUP;
+
+-- 
