@@ -328,4 +328,68 @@ SELECT fa.ator_id, f.classificacao, count(*)
 	INNER JOIN filme f ON fa.filme_id = f.filme_id
     GROUP BY fa.ator_id, f.classificacao WITH ROLLUP;
 
--- 
+
+
+------------------------------- Subquery ----------------------------
+-- Pegar o menor valor, se faz assim
+SELECT 
+	p.valor
+FROM pagamento p
+	WHERE p.valor = (SELECT MIN(valor) FROM pagamento);
+
+-- invés disso
+SELECT 
+	p.valor
+FROM pagamento p
+	WHERE p.valor = MIN(p.valor);
+
+-- Pegando todas as cidades de um determinado país
+SELECT
+	*
+FROM 
+	cidade
+    WHERE pais_id IN(-- se usa IN para procurar entre os valores que a query passar
+        SELECT pais_id FROM  pais WHERE pais IN('Mexico','Colombia') -- essa query retorna 2 valores
+    );
+
+-- Pegando todos os cliente que pagaram mais que clientes da Norte America
+
+SELECT
+	COUNT(*)
+FROM 
+	aluguel a
+    
+GROUP BY a.cliente_id
+
+HAVING COUNT(*) > ALL ( -- se mudarmos o ALL por ANY ele vai ver se pelo menos é maior que 1, já o ALL 
+                        --tem que ser de todos, como seu próprio nome explica
+		SELECT 
+    		COUNT(*)
+    	FROM
+    		aluguel a
+    	INNER JOIN cliente c ON c.cliente_id = a.cliente_id
+    	INNER JOIN endereco e ON e.endereco_id = c.endereco_id
+    	INNER JOIN cidade cd ON cd.cidade_id = e.cidade_id
+        INNER JOIN pais p ON p.pais_id = cd.pais_id
+    	
+    	WHERE p.pais IN ('Estados Unidos','Mexico','Canada')
+    	GROUP BY a.cliente_id
+    	
+	)
+
+ORDER BY COUNT(*) DESC ;
+
+-- Pega os filmes que tem a classificação = 'PG' e que tenha um ator que termina com o nome = 'MONROE'
+
+SELECT 
+	ator_id, filme_id
+FROM 
+	filme_ator
+	WHERE (ator_id, filme_id) IN -- (c1,c2) pq a subquery retorna duas colunas
+		(SELECT a.ator_id, f.filme_id
+			FROM ator a
+			CROSS JOIN filme f -- faz varias combinações com cada 
+			WHERE a.ultimo_nome = 'MONROE'
+			AND f.classificacao = 'PG'
+        );
+    	
