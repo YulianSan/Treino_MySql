@@ -34,4 +34,4 @@ select
 		else 0
     end) `R`
     
-from filme f;
+from filme f; 

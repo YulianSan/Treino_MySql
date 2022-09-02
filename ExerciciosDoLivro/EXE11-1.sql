@@ -21,4 +21,4 @@ select
         when nome IN('Japanese','Mandarin') then 'utf8'
         else 'Unknown'
 	end character_set
-from idioma;
+from idioma; 
