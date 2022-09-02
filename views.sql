@@ -560,4 +560,3 @@ SELECT
 from aluguel
 
 
-
