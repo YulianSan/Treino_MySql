@@ -392,4 +392,171 @@ FROM
 			WHERE a.ultimo_nome = 'MONROE'
 			AND f.classificacao = 'PG'
         );
+
+-- Criando tabelas com subquery e fazendo inner join
+
+SELECT
+	c.primeiro_nome,
+    pagamento_cliente.n_pagamento,
+    pagamento_cliente.ValorTotal
+FROM cliente c
+    INNER JOIN (
+        SELECT 
+        	p.pagamento_id,
+            COUNT(*) AS n_pagamento,
+        	SUM(p.valor) AS ValorTotal
+        FROM pagamento p
+        	GROUP BY p.cliente_id
+    ) pagamento_cliente --pelo que parece n da para usar alias nessas tabelas
+        on c.cliente_id = pagamento_cliente.pagamento_id
+    ORDER BY 2 DESC, 3 DESC;
+
+-- CUIDADE COM COLOCAR SEMPRE * EM COUNT
+
+select 
+    -- se eu colocar * no count ele me retorna
+    -- valores indesejados, pois se ele vai contar o número
+    -- de linhas agrupadas, ñ o número de copias com o valor ñ nulo
+
+	f.titulo, count(i.inventario_id) num_copias
+from filme f
+	LEFT OUTER JOIN inventario i
+    using(filme_id)
+    
+group by f.filme_id;
+
+-- CROSS JOIN é usado para fazer uma linha combinar com todas as linhas de outra tabela
+
+select 
+	c.nome categoria_nome, i.nome idioma_nome
+from categoria c
+	cross join idioma i;
+
+-- RESULTADO
+
+-- Travel	German
+-- Travel	French
+-- Travel	Mandarin
+-- Travel	Japanese
+-- Travel	Italian
+-- Travel	English
+-- Sports	German
+-- Sports	French
+-- Sports	Mandarin
+-- Sports	Japanese
+-- Sports	Italian
+-- Sports	English
     	
+-- Coisa que dá para fazer com cross join
+-- essa query retorna a contagem de 1 a 400, mas como eu limito ela
+-- retornar 366, ela vai retornar ate esse valor máximo como se estivesse contando os dias do ano
+
+SELECT 
+    ones.num + tens.num + hundreds.num + 1 contagem_1_400
+    -- essa linha de código mostra os 366 dias do ano,
+    -- esse comando soma em dias os números retornados a uma data
+    DATE_ADD('2020-01-01', INTERVAL (ones.num + tens.num + hundreds.num) DAY) 
+ FROM
+ (
+    SELECT 0 num UNION ALL
+    SELECT 1 num UNION ALL
+    SELECT 2 num UNION ALL
+    SELECT 3 num UNION ALL
+    SELECT 4 num UNION ALL
+    SELECT 5 num UNION ALL
+    SELECT 6 num UNION ALL
+    SELECT 7 num UNION ALL
+    SELECT 8 num UNION ALL
+    SELECT 9 num
+ ) ones
+ 
+ CROSS JOIN
+ (
+    SELECT 0 num UNION ALL
+    SELECT 10 num UNION ALL
+    SELECT 20 num UNION ALL
+    SELECT 30 num UNION ALL
+    SELECT 40 num UNION ALL
+    SELECT 50 num UNION ALL
+    SELECT 60 num UNION ALL
+    SELECT 70 num UNION ALL
+    SELECT 80 num UNION ALL
+    SELECT 90 num
+ ) tens
+
+ CROSS JOIN
+ (
+    SELECT 0 num UNION ALL
+    SELECT 100 num UNION ALL
+    SELECT 200 num UNION ALL
+    SELECT 300 num
+ ) hundreds
+ 
+ order by ones.num + tens.num + hundreds.num
+ -- tá errado fazer desta forma pois um ano pode ter 365 ou 366;
+ limit 366 
+ -- a melhor forma é comparar a data com o primeiro dia do próximo ano
+ -- desta forma:
+ where DATE_ADD('2020-01-01', INTERVAL (ones.num + tens.num + hundreds.num) DAY) < '2021-01-01';
+
+
+
+
+ -- vendo quantos aluguéis foram efetuados cada dia do ano de 2005
+
+ use treino;
+SELECT datas.dias ,COUNT(a.aluguel_id) numero_alugueis from aluguel a
+RIGHT JOIN(
+	SELECT 
+    ones.num + tens.num + hundreds.num + 1 contagem_1_400,
+    -- essa linha de código mostra os 366 dias do ano,
+    -- esse comando soma em dias os números retornados a uma data
+    DATE_ADD('2005-01-01', INTERVAL (ones.num + tens.num + hundreds.num) DAY) dias
+ FROM
+ (
+    SELECT 0 num UNION ALL
+    SELECT 1 num UNION ALL
+    SELECT 2 num UNION ALL
+    SELECT 3 num UNION ALL
+    SELECT 4 num UNION ALL
+    SELECT 5 num UNION ALL
+    SELECT 6 num UNION ALL
+    SELECT 7 num UNION ALL
+    SELECT 8 num UNION ALL
+    SELECT 9 num
+ ) ones
+ 
+ CROSS JOIN
+ (
+    SELECT 0 num UNION ALL
+    SELECT 10 num UNION ALL
+    SELECT 20 num UNION ALL
+    SELECT 30 num UNION ALL
+    SELECT 40 num UNION ALL
+    SELECT 50 num UNION ALL
+    SELECT 60 num UNION ALL
+    SELECT 70 num UNION ALL
+    SELECT 80 num UNION ALL
+    SELECT 90 num
+ ) tens
+
+ CROSS JOIN
+ (
+    SELECT 0 num UNION ALL
+    SELECT 100 num UNION ALL
+    SELECT 200 num UNION ALL
+    SELECT 300 num
+ ) hundreds
+ 
+ where DATE_ADD('2005-01-01', INTERVAL (ones.num + tens.num + hundreds.num) DAY) < '2006-01-01'
+ order by 1
+) datas on datas.dias = date(a.data_de_aluguel)
+GROUP BY 1
+ORDER BY 1;
+
+--pegando apenas a data, não as hora, min e sec
+SELECT 
+	date(data_de_aluguel)
+from aluguel
+
+
